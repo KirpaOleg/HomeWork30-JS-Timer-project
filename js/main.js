@@ -2,56 +2,54 @@
 
 // Получаю доступ к инпуту и кнопке
 const btn = document.querySelector('.play-btn');
-const inp = document.querySelector('input[type="time"]');
-// console.log(btn);
-// console.log(inp);
+const inp = document.querySelector('.time-inp');
+const timerMain = document.querySelector('.timer__main-clock');
+console.log(btn);
+console.log(inp);
+console.log(timerMain);
 
-// Получаю текущее время и перевожу его в милисекунды
-const timeNow = new Date().toLocaleTimeString();
-console.log(timeNow); 
-let timeNowParts = timeNow.split(":");
-// console.log(timeNowParts);
-let milisecNow = timeNowParts[0] * (60000 * 60) + (timeNowParts[1] * 60000) + (timeNowParts[2] * 1000); 
-// console.log(milisecNow);
-
-
-btn.addEventListener('click', () => {
+const checkSetTime = () => {
 // Перевожу данные из инпута в милисекунды
-  let inputVal = inp.value; 
-  // console.log(inputVal);
-  let timeParts = inputVal.split(":");
-  // console.log(timeParts);
-  let milisecInp = timeParts[0] * (60000 * 60) + (timeParts[1] * 60000); 
-  // console.log(milisecInp);
+  let milisecInp = inp.valueAsNumber; 
+   console.log(milisecInp);
+
+   // Получаю текущее время и перевожу его в милисекунды
+  const timeNow = new Date();
+  console.log(timeNow); 
+  let milisecNow = (timeNow.getHours() * 60 + timeNow.getMinutes()) * 60  * 1000; 
+  console.log(milisecNow);
 
   // Разница между текущим временем и инпутом
-  let diffTime = milisecNow - milisecInp;
-  // console.log(diffTime);
-
-  // Получаю доступ к таймеру
-  let timerMain = document.querySelector('.timer__main-clock');
-  // console.log(timerMain);
-
-  // Создаю переменную и присваиваю ей разницу времени
-  let clock = diffTime;
-  console.log(clock);
+  let diffTime = (milisecInp - milisecNow) / 1000;
+  console.log(diffTime);
 
   const showSecond = () => {
     // Получаю секунды, минуты, часы
-    let sec = Math.floor(clock % 60)
-    let min = Math.floor(clock / 60 % 60)
-    let hour = Math.floor(clock / 60 / 60 % 60)
+    let sec = Math.floor(diffTime % 60);
+    let min = Math.floor((diffTime / 60) % 60);
+    let hour = Math.floor((diffTime / (60 * 60)) % 24);
+    console.log(sec);
+    console.log(min);
+    console.log(hour); 
 
-    if (clock <= 0) {
+    if (sec < 10) {
+      sec = `0${sec}`;
+    }
+    if (min < 10) {
+      min = `0${min}`;
+    }
+    if (hour < 10) {
+      hour = `0${hour}`;
+    }
+
+    timerMain.innerHTML = `${hour}:${min}:${sec}`;
+    diffTime--;
+
+    if (diffTime === 0) {
     console.log(`Останавливаем таймер`)
     clearInterval(timer);
-     } else {
-      let timerShow = `${('0' + hour).slice(-2)}:${('0' + min).slice(-2)}:${('0' + sec).slice(-2)}`;
-      timerMain.innerText = timerShow;
-      console.log(timerShow);
-     }
-     clock--;
-   };
-
-   const timer = setInterval(showSecond, 1000);
-}); 
+    }    
+  };
+  let timer = setInterval(showSecond, 1000);
+}; 
+btn.addEventListener('click', checkSetTime);
